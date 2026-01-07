@@ -13,31 +13,58 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'adviser') {
 </head>
 <body>
 
-<!-- TOP NAVBAR -->
 <div class="navbar">
     <div class="nav-title">BSANHS Grade System</div>
     <a href="../logout.php" class="logout">Logout</a>
 </div>
 
-<!-- DASHBOARD -->
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
     <div class="sidebar">
-        <a class="active">Dashboard</a>
-        <a>Encode Grades</a>
-        <a>Profile</a>
+        <a class="active">Compiled Grades</a>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="content">
-        <h2>Welcome, Adviser</h2>
-        <p>You can encode grades online or offline.</p>
+        <h2>Advisory Class Grades</h2>
 
-        <div class="card">
-            <h3>Quick Info</h3>
-            <p>STE Grade Encoding System</p>
-        </div>
+        <?php
+        $query = mysqli_query($conn, "
+            SELECT s.name, s.grade_level, s.section,
+                   g.subject, g.grade
+            FROM grades g
+            JOIN students s ON s.id = g.student_id
+            WHERE g.submitted = 1
+            ORDER BY s.name
+        ");
+
+        $currentStudent = "";
+        while ($row = mysqli_fetch_assoc($query)) {
+
+            if ($currentStudent != $row['name']) {
+                if ($currentStudent != "") {
+                    echo "</table><br>";
+                }
+
+                $currentStudent = $row['name'];
+
+                echo "<h3>{$row['name']} - Grade {$row['grade_level']} {$row['section']}</h3>";
+                echo "<table>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Grade</th>
+                        </tr>";
+            }
+
+            echo "<tr>
+                    <td>{$row['subject']}</td>
+                    <td>{$row['grade']}</td>
+                  </tr>";
+        }
+
+        if ($currentStudent != "") {
+            echo "</table>";
+        }
+        ?>
     </div>
 
 </div>

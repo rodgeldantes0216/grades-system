@@ -1,9 +1,20 @@
 <?php
 session_start();
+include '../db.php';
+
 if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'parent') {
     header("Location: ../index.php");
     exit;
 }
+
+$user_id = $_SESSION['user_id'];
+
+$user = mysqli_fetch_assoc(
+    mysqli_query($conn, "SELECT related_student_id FROM users WHERE id = $user_id")
+);
+
+$student_id = $user['related_student_id'];
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -13,31 +24,42 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'parent') {
 </head>
 <body>
 
-<!-- TOP NAVBAR -->
 <div class="navbar">
     <div class="nav-title">BSANHS Grade System</div>
     <a href="../logout.php" class="logout">Logout</a>
 </div>
 
-<!-- DASHBOARD -->
 <div class="dashboard">
 
-    <!-- SIDEBAR -->
     <div class="sidebar">
-        <a class="active">Dashboard</a>
-        <a>Encode Grades</a>
-        <a>Profile</a>
+        <a class="active">Child Grades</a>
     </div>
 
-    <!-- MAIN CONTENT -->
     <div class="content">
-        <h2>Welcome, Parent</h2>
-        <p>You can view grades online or offline.</p>
+        <h2>My Child’s Grades</h2>
 
-        <div class="card">
-            <h3>Quick Info</h3>
-            <p>STE Grade Encoding System</p>
-        </div>
+        <table>
+            <tr>
+                <th>Subject</th>
+                <th>Grade</th>
+            </tr>
+
+            <?php
+            $grades = mysqli_query($conn, "
+                SELECT subject, grade
+                FROM grades
+                WHERE student_id = $student_id
+                  AND submitted = 1
+            ");
+
+            while ($g = mysqli_fetch_assoc($grades)) {
+                echo "<tr>
+                        <td>{$g['subject']}</td>
+                        <td>{$g['grade']}</td>
+                      </tr>";
+            }
+            ?>
+        </table>
     </div>
 
 </div>

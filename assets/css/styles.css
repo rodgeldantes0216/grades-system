@@ -140,3 +140,12 @@ table th, table td {
   padding: 8px;
 }
 
+#syncBtn {
+  margin-top: 15px;
+  background: #4fa3ff;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+

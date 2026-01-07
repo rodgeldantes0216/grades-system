@@ -45,3 +45,40 @@ function loadOfflineGrades() {
         tbody.innerHTML += row;
     });
 }
+
+const syncBtn = document.getElementById("syncBtn");
+const statusText = document.getElementById("syncStatus");
+
+if (syncBtn) {
+    syncBtn.addEventListener("click", syncGrades);
+}
+
+window.addEventListener("online", () => {
+    syncGrades();
+});
+
+function syncGrades() {
+    let grades = JSON.parse(localStorage.getItem("offline_grades")) || [];
+
+    if (grades.length === 0) {
+        statusText.innerText = "No grades to submit.";
+        return;
+    }
+
+    fetch("../api/grades.php", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(grades)
+    })
+    .then(res => res.json())
+    .then(data => {
+        localStorage.removeItem("offline_grades");
+        loadOfflineGrades();
+        statusText.innerText = "Grades successfully submitted!";
+    })
+    .catch(() => {
+        statusText.innerText = "Offline. Will sync when online.";
+    });
+}

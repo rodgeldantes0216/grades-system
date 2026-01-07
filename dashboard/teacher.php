@@ -57,6 +57,9 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'teacher') {
             </thead>
             <tbody id="offlineGrades"></tbody>
         </table>
+        <button id="syncBtn">Submit Grades</button>
+        <p id="syncStatus"></p>
+
     </div>
 
 </div>
